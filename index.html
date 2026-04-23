@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Asistencia - Hotel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app-container">
+    <!-- Selector de dispositivo -->
+    <section id="screen-role" class="screen active">
+      <div class="card center-card">
+        <p class="eyebrow">Hotel asistido</p>
+        <h1>Seleccione el dispositivo</h1>
+        <p class="subtitle">Use una vista para recepción y otra para la pantalla táctil del huésped.</p>
+
+        <div class="button-grid role-grid">
+          <button class="big-button" onclick="setDeviceRole('reception')">
+            <span class="icon">🧑‍💼</span>
+            <span>
+              <strong>Recepción</strong>
+              <small>El recepcionista selecciona la accesibilidad del huésped.</small>
+            </span>
+          </button>
+
+          <button class="big-button" onclick="setDeviceRole('guest')">
+            <span class="icon">🖥️</span>
+            <span>
+              <strong>Pantalla táctil</strong>
+              <small>Se queda a la espera y abre el modo indicado por recepción.</small>
+            </span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Panel recepción -->
+    <section id="screen-reception" class="screen">
+      <div class="card center-card">
+        <div class="screen-heading">
+          <div>
+            <p class="eyebrow">Dispositivo: recepción</p>
+            <h1>Seleccione la accesibilidad del huésped</h1>
+            <p class="subtitle">La pantalla táctil cambiará automáticamente al modo elegido.</p>
+          </div>
+          <span class="status-chip">Sincronización local</span>
+        </div>
+
+        <div class="button-grid">
+          <button class="big-button" onclick="activateGuestMode('blind')">
+            <span class="icon">🦯</span>
+            <span>Audio</span>
+          </button>
+
+          <button class="big-button" onclick="activateGuestMode('deaf')">
+            <span class="icon">👂❌</span>
+            <span>Visual</span>
+          </button>
+
+          <button class="big-button" onclick="activateGuestMode('speech')">
+            <span class="icon">🗣️</span>
+            <span>Guiado</span>
+          </button>
+        </div>
+
+        <div class="message-box status-box" aria-live="polite">
+          <strong>Estado de la pantalla táctil</strong>
+          <p id="reception-status">A la espera de una selección.</p>
+        </div>
+
+        <div class="button-grid role-grid compact-grid">
+          <button class="big-button secondary-button" onclick="resetGuestMode()">
+            <span class="icon">↺</span>
+            <span>Volver a pantalla de espera</span>
+          </button>
+
+          <button class="big-button secondary-button" onclick="goToScreen('screen-admin')">
+            <span class="icon">⚙️</span>
+            <span>Administrar mensajes</span>
+          </button>
+        </div>
+
+        <button class="back-button" onclick="setDeviceRole(null)">Cambiar dispositivo</button>
+      </div>
+    </section>
+
+    <!-- Espera huésped -->
+    <section id="screen-guest-waiting" class="screen">
+      <div class="waiting-stage" onclick="handleWaitingScreenTap(event)">
+        <div class="brand-lockup" aria-hidden="true">
+          <div class="brand-wordmark">BRUNO</div>
+          <div class="brand-symbols">
+            <span class="brand-gear-wrap">
+              <i class="fa-solid fa-gear brand-gear"></i>
+              <span class="brand-gear-core"></span>
+            </span>
+            <span class="brand-robot-wrap">
+              <i class="fa-solid fa-robot brand-robot"></i>
+            </span>
+          </div>
+        </div>
+
+        <p class="waiting-tagline">Bot de Relación Universal para Negocios y Organizaciones</p>
+
+        <div class="waiting-intro" aria-live="polite">
+          <p class="waiting-greeting">Hola, soy Bruno, tu asistente digital.</p>
+          <p class="waiting-copy">Estoy listo para adaptar esta pantalla a la forma de comunicación que necesites. En unos segundos recepción seleccionará el modo adecuado para ti.</p>
+        </div>
+
+        <div class="waiting-loader" aria-hidden="true">
+          <span class="loader-dot"></span>
+          <span class="loader-dot"></span>
+          <span class="loader-dot"></span>
+        </div>
+
+        <p id="guest-status" class="waiting-status">Esperando selección de accesibilidad desde recepción...</p>
+        <button class="waiting-link" onclick="setDeviceRole(null)">Cambiar dispositivo</button>
+      </div>
+    </section>
+
+    <!-- Pantalla Audio -->
+    <section id="screen-blind" class="screen">
+      <div class="card">
+        <h2>Modo: Audio</h2>
+        <p class="subtitle">La forma más cómoda aquí es hablar directamente con Bruno y dejar botones grandes solo como respaldo.</p>
+
+        <div class="blind-flow" aria-live="polite">
+          <button id="blind-voice-button" class="blind-voice-button" type="button" onclick="toggleBlindListening()">
+            <span class="blind-voice-icon" aria-hidden="true">
+              <i class="fa-solid fa-microphone-lines"></i>
+            </span>
+            <span class="blind-voice-content">
+              <strong>Preguntar por voz</strong>
+              <small>Toque una vez, hable y Bruno interpretará su consulta.</small>
+            </span>
+          </button>
+
+          <div id="blind-voice-status" class="message-box blind-voice-status">Listo para escuchar. Puede decir: quiero hacer check-in, necesito ayuda o información del hotel.</div>
+
+          <p class="blind-voice-hint">Accesos rápidos disponibles por si prefiere no hablar:</p>
+
+          <div class="button-grid blind-shortcuts">
+            <button class="big-button blind-shortcut-button" onclick="handleBlindOption('checkin')">
+              <span class="icon">🛎️</span>
+              <span>Quiero hacer check-in</span>
+            </button>
+
+            <button class="big-button blind-shortcut-button" onclick="handleBlindOption('hotel')">
+              <span class="icon">🏨</span>
+              <span>Información del hotel</span>
+            </button>
+
+            <button class="big-button blind-shortcut-button urgent-button" onclick="handleBlindOption('help')">
+              <span class="icon">🙋</span>
+              <span>Necesito ayuda ahora</span>
+            </button>
+          </div>
+
+          <div class="button-grid single-column blind-secondary-actions">
+            <button class="big-button secondary-button blind-action-button" onclick="speakWelcomeBlind()">
+              <span class="icon">🔊</span>
+              <span>Repetir instrucciones</span>
+            </button>
+          </div>
+
+          <div class="managed-section">
+            <h3>Mensajes personalizados de recepción</h3>
+            <div id="blind-managed-messages" class="button-grid single-column managed-messages-list"></div>
+          </div>
+        </div>
+
+        <button class="back-button" onclick="returnGuestHome()">← Volver</button>
+      </div>
+    </section>
+
+    <!-- Pantalla Visual -->
+    <section id="screen-deaf" class="screen">
+      <div class="card">
+        <h2>Modo: Visual</h2>
+        <p class="subtitle">Interfaz visual con mensajes en pantalla.</p>
+
+        <div class="button-grid single-column">
+          <button class="big-button" onclick="showVisualMessage('Check-in', 'Puede realizar el check-in en recepción. Presente su documento y reserva.')">
+            <span class="icon">🛎️</span>
+            <span>Check-in</span>
+          </button>
+
+          <button class="big-button" onclick="showVisualMessage('WiFi', 'La red WiFi es HOTEL_GUEST y la contraseña está disponible en recepción.')">
+            <span class="icon">📶</span>
+            <span>WiFi</span>
+          </button>
+
+          <button class="big-button" onclick="showVisualMessage('Desayuno', 'El horario del desayuno es de 7:00 a 10:30.')">
+            <span class="icon">🍳</span>
+            <span>Horario del desayuno</span>
+          </button>
+
+          <button class="big-button" onclick="showVisualMessage('Asistencia', 'Un miembro del personal se acercará para asistirle en breve.')">
+            <span class="icon">🤝</span>
+            <span>Solicitar asistencia</span>
+          </button>
+        </div>
+
+        <div class="managed-section">
+          <h3>Mensajes personalizados de recepción</h3>
+          <div id="deaf-managed-messages" class="button-grid single-column managed-messages-list"></div>
+        </div>
+
+        <button class="back-button" onclick="returnGuestHome()">← Volver</button>
+      </div>
+    </section>
+
+    <!-- Pantalla Guiado -->
+    <section id="screen-speech" class="screen">
+      <div class="card">
+        <h2>Modo: Guiado</h2>
+        <p class="subtitle">Seleccione una frase o escriba un texto para que el narrador lo lea al personal.</p>
+
+        <div class="button-grid single-column">
+          <button class="big-button" onclick="speakForUser('Quiero hacer check-in')">
+            <span class="icon">🛎️</span>
+            <span>Quiero hacer check-in</span>
+          </button>
+
+          <button class="big-button" onclick="speakForUser('Necesito ayuda')">
+            <span class="icon">🙋</span>
+            <span>Necesito ayuda</span>
+          </button>
+
+          <button class="big-button" onclick="speakForUser('Tengo una consulta')">
+            <span class="icon">❓</span>
+            <span>Tengo una consulta</span>
+          </button>
+        </div>
+
+        <div id="speech-output" class="message-box" aria-live="polite">
+          El mensaje seleccionado aparecerá aquí.
+        </div>
+
+        <div class="speech-text-reader">
+          <label for="speech-custom-text">Texto para narrador</label>
+          <textarea id="speech-custom-text" rows="4" placeholder="Ej: Hola, necesito ayuda con mi reserva."></textarea>
+          <button class="big-button secondary-button" type="button" onclick="speakCustomNarratorText()">
+            <span class="icon">🔊</span>
+            <span>Leer texto escrito</span>
+          </button>
+        </div>
+
+        <div class="managed-section">
+          <h3>Frases personalizadas cargadas por recepción</h3>
+          <div id="speech-managed-messages" class="button-grid single-column managed-messages-list"></div>
+        </div>
+
+        <button class="back-button" onclick="returnGuestHome()">← Volver</button>
+      </div>
+    </section>
+
+    <!-- Panel de administrador -->
+    <section id="screen-admin" class="screen">
+      <div class="card">
+        <h2>Panel de administrador</h2>
+        <p class="subtitle">Agregar mensajes simulados por tipo de accesibilidad, apartado e icono personalizado.</p>
+
+        <form id="admin-form" class="admin-form">
+          <label>
+            Título
+            <input type="text" id="admin-title" placeholder="Ej: Horario de piscina" required />
+          </label>
+
+          <label>
+            Contenido
+            <textarea id="admin-content" rows="4" placeholder="Escriba el mensaje..." required></textarea>
+          </label>
+
+          <label>
+            Tipo de accesibilidad
+            <select id="admin-type" required>
+              <option value="blind">Audio</option>
+              <option value="deaf">Visual</option>
+              <option value="speech">Guiado</option>
+            </select>
+          </label>
+
+          <div class="admin-inline-fields">
+            <label>
+              Apartado
+              <input type="text" id="admin-section" placeholder="Ej: Servicios" />
+            </label>
+
+            <label>
+              Icono personalizado
+              <input type="text" id="admin-icon" placeholder="Ej: wifi 🛜" />
+            </label>
+          </div>
+
+          <label>
+            Palabras clave opcionales
+            <input type="text" id="admin-keywords" placeholder="Ej: piscina, horario, spa" />
+          </label>
+
+          <button type="submit" class="big-button submit-button">
+            <span class="icon">➕</span>
+            <span>Guardar mensaje</span>
+          </button>
+        </form>
+
+        <div class="saved-list">
+          <h3>Mensajes guardados</h3>
+          <div id="saved-messages"></div>
+        </div>
+
+        <button class="back-button" onclick="goToScreen('screen-reception')">← Volver</button>
+      </div>
+    </section>
+  </main>
+
+  <button id="theme-toggle" class="theme-toggle-fab" type="button" onclick="toggleTheme()" aria-label="Cambiar tema">☀️ Claro</button>
+
+  <!-- Modal / caja de mensaje -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <h3 id="modal-title"></h3>
+      <p id="modal-text"></p>
+      <button class="back-button" onclick="closeModal()">Cerrar</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
