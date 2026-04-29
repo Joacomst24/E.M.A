@@ -1,29 +1,28 @@
 // ===============================
 // Datos simulados del sistema
 // ===============================
-const ADMIN_MESSAGES_KEY = "hotel-assistance-admin-messages";
-const THEME_KEY = "hotel-assistance-theme";
+const ADMIN_MESSAGES_KEY = "ema-hospital-admin-messages";
 const BLIND_OPTIONS = [
   {
-    id: "checkin",
-    icon: "🛎️",
-    label: "Check-in",
-    description: "Iniciar el registro con ayuda del personal de recepción.",
-    keywords: ["check in", "checkin", "registro", "entrar", "reserva"]
+    id: "admission",
+    icon: "🏥",
+    label: "Registro de paciente",
+    description: "Iniciar el registro en admision con apoyo del personal.",
+    keywords: ["registro", "admision", "ingreso", "anotarme", "paciente"]
   },
   {
-    id: "hotel",
-    icon: "🏨",
-    label: "Información del hotel",
-    description: "Escuchar horarios, servicios y ubicación de áreas comunes.",
-    keywords: ["hotel", "informacion", "wifi", "desayuno", "horario", "servicios"]
+    id: "info",
+    icon: "📋",
+    label: "Informacion de atencion",
+    description: "Escuchar turnos, consultorios e indicaciones generales.",
+    keywords: ["informacion", "turno", "consultorio", "atencion", "horario", "indicaciones"]
   },
   {
     id: "help",
-    icon: "🙋",
+    icon: "🚑",
     label: "Solicitar ayuda",
-    description: "Llamar a una persona del personal para asistencia inmediata.",
-    keywords: ["ayuda", "asistencia", "personal", "recepcion", "recepcionista", "problema"]
+    description: "Llamar al personal de salud para asistencia inmediata.",
+    keywords: ["ayuda", "asistencia", "enfermeria", "personal", "urgente", "problema"]
   }
 ];
 const ACCESSIBILITY_CONFIG = {
@@ -32,7 +31,7 @@ const ACCESSIBILITY_CONFIG = {
     screenId: "screen-blind"
   },
   deaf: {
-    label: "Visual",
+    label: "Texto",
     screenId: "screen-deaf"
   },
   speech: {
@@ -40,7 +39,7 @@ const ACCESSIBILITY_CONFIG = {
     screenId: "screen-speech"
   }
 };
-const SHARED_STATE_KEY = "hotel-assistance-state";
+const SHARED_STATE_KEY = "ema-hospital-state";
 const savedMessages = loadSavedMessages();
 
 let currentRole = null;
@@ -48,39 +47,42 @@ let syncChannel = null;
 let blindRecognition = null;
 let blindListening = false;
 let blindMicPermissionChecked = false;
+let preferredFemaleVoice = null;
 
-function getPreferredTheme() {
-  const savedTheme = localStorage.getItem(THEME_KEY);
-  return savedTheme === "light" || savedTheme === "dark" ? savedTheme : "dark";
+function scoreVoiceAsFemale(voice) {
+  const voiceText = normalizeText(`${voice.name} ${voice.lang}`);
+  const femaleHints = ["female", "mujer", "femenina", "paulina", "monica", "helena", "sofia", "maria", "laura"];
+  return femaleHints.some((hint) => voiceText.includes(hint));
 }
 
-function updateThemeToggleButton(theme) {
-  const toggleButton = document.getElementById("theme-toggle");
+function selectPreferredFemaleVoice() {
+  if (!("speechSynthesis" in window)) {
+    return null;
+  }
 
-  if (!toggleButton) {
+  const voices = window.speechSynthesis.getVoices();
+
+  if (!Array.isArray(voices) || voices.length === 0) {
+    return null;
+  }
+
+  const spanishVoices = voices.filter((voice) => (voice.lang || "").toLowerCase().startsWith("es"));
+  const voicePool = spanishVoices.length > 0 ? spanishVoices : voices;
+
+  const femaleVoice = voicePool.find((voice) => scoreVoiceAsFemale(voice));
+  return femaleVoice || voicePool[0] || null;
+}
+
+function initializePreferredVoice() {
+  preferredFemaleVoice = selectPreferredFemaleVoice();
+
+  if (!("speechSynthesis" in window)) {
     return;
   }
 
-  if (theme === "light") {
-    toggleButton.textContent = "🌙 Oscuro";
-    toggleButton.setAttribute("aria-label", "Cambiar a modo oscuro");
-    return;
-  }
-
-  toggleButton.textContent = "☀️ Claro";
-  toggleButton.setAttribute("aria-label", "Cambiar a modo claro");
-}
-
-function applyTheme(theme) {
-  document.body.setAttribute("data-theme", theme);
-  localStorage.setItem(THEME_KEY, theme);
-  updateThemeToggleButton(theme);
-}
-
-function toggleTheme() {
-  const currentTheme = document.body.getAttribute("data-theme") || getPreferredTheme();
-  const nextTheme = currentTheme === "dark" ? "light" : "dark";
-  applyTheme(nextTheme);
+  window.speechSynthesis.onvoiceschanged = () => {
+    preferredFemaleVoice = selectPreferredFemaleVoice();
+  };
 }
 
 function loadSavedMessages() {
@@ -414,11 +416,20 @@ function speakText(text) {
   utterance.rate = 1;
   utterance.pitch = 1;
 
+  if (!preferredFemaleVoice) {
+    preferredFemaleVoice = selectPreferredFemaleVoice();
+  }
+
+  if (preferredFemaleVoice) {
+    utterance.voice = preferredFemaleVoice;
+    utterance.lang = preferredFemaleVoice.lang || "es-ES";
+  }
+
   window.speechSynthesis.speak(utterance);
 }
 
 function speakWaitingInstruction() {
-  speakText("Hola, soy Bruno, tu asistente digital. Estoy listo para adaptar esta pantalla a la forma de comunicación que necesites. Debe esperar a que el recepcionista seleccione el modo de accesibilidad adecuado para usted.");
+  speakText("Hola, soy E.M.A, Enlace Medico Asistido. Estoy listo para adaptar esta pantalla a la forma de comunicacion que necesite. Debe esperar a que recepcion o enfermeria seleccione el modo adecuado para usted.");
 }
 
 function handleWaitingScreenTap(event) {
@@ -506,7 +517,7 @@ function updateBlindVoiceButton() {
 
 function initializeBlindMode() {
   stopBlindListening();
-  setBlindVoiceStatus("Listo para escuchar. Puede decir: quiero hacer check-in, necesito ayuda o información del hotel.");
+  setBlindVoiceStatus("Listo para escuchar. Puede decir: quiero registrarme, informacion de atencion o necesito asistencia.");
   updateBlindVoiceButton();
   speakWelcomeBlind();
 }
@@ -626,9 +637,15 @@ function handleBlindTranscript(transcript) {
     return;
   }
 
-  const fallbackMessage = "No entendí la consulta. Puede decir check-in, información del hotel o ayuda, o usar un mensaje personalizado cargado por recepción.";
-  setBlindVoiceStatus(fallbackMessage);
-  speakText(fallbackMessage);
+  const fallbackMessage = "No entendi la consulta. Puede decir registro, informacion de atencion o ayuda.";
+  if (getSavedMessagesByType("blind").length > 0) {
+    const extended = fallbackMessage + " Tambien puede nombrar alguno de los mensajes del personal medico que aparecen en pantalla.";
+    setBlindVoiceStatus(extended);
+    speakText(extended);
+  } else {
+    setBlindVoiceStatus(fallbackMessage);
+    speakText(fallbackMessage);
+  }
 }
 
 async function startBlindListening() {
@@ -685,10 +702,17 @@ async function toggleBlindListening() {
   if (blindListening) {
     stopBlindListening();
     setBlindVoiceStatus("Escucha detenida. Toque otra vez para hablar.");
+    speakText("Escucha detenida.");
     return;
   }
 
   await startBlindListening();
+}
+
+function handleBlindCardTap(event) {
+  const interactive = event.target.closest("button, a, input, textarea, select");
+  if (interactive) return;
+  toggleBlindListening();
 }
 
 function handleBlindOption(option) {
@@ -696,17 +720,21 @@ function handleBlindOption(option) {
   let statusMessage = "";
 
   switch (option) {
-    case "checkin":
-      message = "Ha seleccionado check-in. Un miembro del personal le asistirá con el registro.";
-      statusMessage = "Consulta detectada: check-in.";
+    case "admission":
+      message = "Ha seleccionado registro de paciente. Un miembro del personal le asistira con la admision.";
+      statusMessage = "Consulta detectada: registro de paciente.";
       break;
-    case "hotel":
-      message = "Ha seleccionado información del hotel. Puede consultar horarios, servicios y ubicación de áreas comunes.";
-      statusMessage = "Consulta detectada: información del hotel.";
+    case "info":
+      message = "Ha seleccionado informacion de atencion. Puede consultar turnos, consultorios e indicaciones generales.";
+      statusMessage = "Consulta detectada: informacion de atencion.";
       break;
     case "help":
-      message = "Ha solicitado ayuda. El personal de recepción acudirá de inmediato.";
-      statusMessage = "Consulta detectada: ayuda inmediata.";
+      message = "Ha solicitado asistencia. El personal de salud acudira de inmediato.";
+      statusMessage = "Consulta detectada: asistencia inmediata.";
+      break;
+    default:
+      message = "No pude identificar la opcion seleccionada. Intente nuevamente con una opcion valida.";
+      statusMessage = "Opcion no reconocida.";
       break;
   }
 
@@ -715,7 +743,6 @@ function handleBlindOption(option) {
   }
 
   speakText(message);
-  showVisualMessage("Información hablada", message);
 }
 
 function handleBlindManagedMessage(messageId) {
@@ -724,7 +751,6 @@ function handleBlindManagedMessage(messageId) {
 
   setBlindVoiceStatus(`Consulta detectada: ${managedMessage.title}.`);
   speakText(managedMessage.content);
-  showVisualMessage(managedMessage.title, managedMessage.content);
 }
 
 function showManagedDeafMessage(messageId) {
@@ -742,7 +768,7 @@ function speakManagedSpeechMessage(messageId) {
 }
 
 function speakWelcomeBlind() {
-  speakText("Ha ingresado al modo audio. Puede hablar directamente con Bruno. Toque el botón preguntar por voz y diga check-in, información del hotel o ayuda. Debajo también tiene accesos rápidos grandes.");
+  speakText("Ha ingresado al modo audio. Puede tocar la pantalla en cualquier parte para hablar con E.M.A. Diga: registro, informacion de atencion, o necesito ayuda.");
 }
 
 // ===============================
@@ -753,6 +779,10 @@ function showVisualMessage(title, text) {
   const modalTitle = document.getElementById("modal-title");
   const modalText = document.getElementById("modal-text");
 
+  if (!modal || !modalTitle || !modalText) {
+    return;
+  }
+
   modalTitle.textContent = title;
   modalText.textContent = text;
   modal.classList.remove("hidden");
@@ -760,6 +790,10 @@ function showVisualMessage(title, text) {
 
 function closeModal() {
   const modal = document.getElementById("modal");
+  if (!modal) {
+    return;
+  }
+
   modal.classList.add("hidden");
 }
 
@@ -807,11 +841,11 @@ function renderSavedMessages() {
     .map(
       (msg) => `
         <div class="saved-item">
-          <strong>${msg.title}</strong>
-          <p>${msg.content}</p>
+          <strong>${escapeHtml(msg.title)}</strong>
+          <p>${escapeHtml(msg.content)}</p>
           <small>Apartado: ${escapeHtml(getMessageSection(msg))}</small>
           <small>Icono: ${escapeHtml(getMessageIcon(msg, "(predeterminado)"))}</small>
-          <small>Tipo: ${msg.type}</small>
+          <small>Tipo: ${escapeHtml(msg.type)}</small>
           <small>Palabras clave: ${escapeHtml((msg.keywords || []).join(", ") || "sin configurar")}</small>
         </div>
       `
@@ -850,17 +884,17 @@ function handleAdminSubmit(event) {
   renderSavedMessages();
   renderManagedMessages();
 
-  showVisualMessage("Mensaje guardado", "El mensaje fue agregado correctamente al panel de administración.");
+  showVisualMessage("Mensaje guardado", "El mensaje fue agregado correctamente al panel de administracion E.M.A.");
 }
 
 // ===============================
 // Inicialización
 // ===============================
 document.addEventListener("DOMContentLoaded", () => {
-  applyTheme(getPreferredTheme());
+  initializePreferredVoice();
 
   if ("BroadcastChannel" in window) {
-    syncChannel = new BroadcastChannel("hotel-assistance-sync");
+    syncChannel = new BroadcastChannel("ema-hospital-sync");
     syncChannel.addEventListener("message", (event) => {
       if (currentRole === "guest") {
         syncGuestScreen(event.data);
@@ -877,7 +911,13 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const parsedState = JSON.parse(event.newValue);
+    let parsedState = null;
+
+    try {
+      parsedState = JSON.parse(event.newValue);
+    } catch {
+      return;
+    }
 
     if (currentRole === "guest") {
       syncGuestScreen(parsedState);
