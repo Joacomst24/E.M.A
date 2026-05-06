@@ -113,30 +113,24 @@
     <!-- Espera huésped -->
     <section id="screen-guest-waiting" class="screen">
       <div class="waiting-stage" onclick="handleWaitingScreenTap(event)">
-        <div class="waiting-topbar" aria-hidden="true">
-          <div class="waiting-brand">
-            <span class="waiting-brand-icon"><i class="fa-solid fa-kit-medical"></i></span>
-            <div class="waiting-brand-copy">
-              <p class="waiting-brand-title">E.M.A</p>
-              <p class="waiting-brand-subtitle">Enlace Medico Asistido</p>
-            </div>
-          </div>
-
-          <div class="waiting-hospital-badge">
-            <span class="badge-h">H</span>
-            <small>HOSPITAL</small>
+        <div class="brand-lockup" aria-hidden="true">
+          <div class="brand-wordmark">BRUNO</div>
+          <div class="brand-symbols">
+            <span class="brand-gear-wrap">
+              <i class="fa-solid fa-gear brand-gear"></i>
+              <span class="brand-gear-core"></span>
+            </span>
+            <span class="brand-robot-wrap">
+              <i class="fa-solid fa-robot brand-robot"></i>
+            </span>
           </div>
         </div>
 
-        <div class="waiting-intro-card" aria-live="polite">
-          <div class="waiting-intro-icon" aria-hidden="true">
-            <i class="fa-solid fa-user-doctor"></i>
-          </div>
-          <div class="waiting-intro-copy">
-            <p class="waiting-greeting">Hola, soy EMA, tu asistente digital.</p>
-            <p class="waiting-copy">Estoy listo para adaptar esta pantalla a la forma de comunicacion que necesites.</p>
-            <p class="waiting-copy">Si no puedes ver la pantalla, puedes decir en voz alta: <strong>audio, texto o guiado.</strong></p>
-          </div>
+        <p class="waiting-tagline">Bot de Relación Universal para Negocios y Organizaciones</p>
+
+        <div class="waiting-intro" aria-live="polite">
+          <p class="waiting-greeting">Hola, soy Bruno, tu asistente digital.</p>
+          <p class="waiting-copy">Estoy listo para adaptar esta pantalla a la forma de comunicación que necesites. En unos segundos recepción seleccionará el modo adecuado para ti.</p>
         </div>
 
         <div class="waiting-loader" aria-hidden="true">
@@ -145,56 +139,8 @@
           <span class="loader-dot"></span>
         </div>
 
-        <p id="guest-status" class="waiting-status">Esperando seleccion de accesibilidad desde recepcion/enfermeria o por voz del paciente...</p>
-
-        <div class="waiting-section-heading" aria-hidden="true">
-          <span class="waiting-section-line"></span>
-          <p>Como prefieres comunicarte?</p>
-          <span class="waiting-section-line"></span>
-        </div>
-
-        <div class="waiting-mode-grid" aria-label="Seleccion rapida de accesibilidad">
-          <button class="waiting-mode-button" type="button" onclick="selectGuestModeFromWaiting('blind')">
-            <span class="waiting-mode-icon" aria-hidden="true"><i class="fa-solid fa-volume-high"></i></span>
-            <span class="waiting-mode-copy">
-              <strong>Audio asistido</strong>
-              <small>Interaccion por voz para pacientes con baja o nula vision.</small>
-            </span>
-            <span class="waiting-mode-chevron" aria-hidden="true"><i class="fa-solid fa-angle-right"></i></span>
-          </button>
-
-          <button class="waiting-mode-button" type="button" onclick="selectGuestModeFromWaiting('deaf')">
-            <span class="waiting-mode-icon waiting-mode-icon-text" aria-hidden="true">Tt</span>
-            <span class="waiting-mode-copy">
-              <strong>Texto visual</strong>
-              <small>Mensajes claros en pantalla para lectura y seleccion tactil.</small>
-            </span>
-            <span class="waiting-mode-chevron" aria-hidden="true"><i class="fa-solid fa-angle-right"></i></span>
-          </button>
-
-          <button class="waiting-mode-button" type="button" onclick="selectGuestModeFromWaiting('speech')">
-            <span class="waiting-mode-icon" aria-hidden="true"><i class="fa-solid fa-comments"></i></span>
-            <span class="waiting-mode-copy">
-              <strong>Guiado por frases</strong>
-              <small>El paciente elige frases para narrarlas al personal de salud.</small>
-            </span>
-            <span class="waiting-mode-chevron" aria-hidden="true"><i class="fa-solid fa-angle-right"></i></span>
-          </button>
-        </div>
-
-        <button class="waiting-link" onclick="setDeviceRole(null)">
-          <span class="waiting-link-icon" aria-hidden="true"><i class="fa-solid fa-gear"></i></span>
-          <span class="waiting-link-copy">
-            <strong>Cambiar dispositivo</strong>
-            <small>Ajusta la configuracion del dispositivo actual</small>
-          </span>
-          <span class="waiting-mode-chevron" aria-hidden="true"><i class="fa-solid fa-angle-right"></i></span>
-        </button>
-
-        <p class="waiting-footnote" aria-hidden="true">
-          <i class="fa-solid fa-shield-heart"></i>
-          Disenado para mejorar la comunicacion y tu experiencia en el hospital
-        </p>
+        <p id="guest-status" class="waiting-status">Esperando selección de accesibilidad desde recepción...</p>
+        <button class="waiting-link" onclick="setDeviceRole(null)">Cambiar dispositivo</button>
       </div>
     </section>
 

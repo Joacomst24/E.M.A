@@ -1,4 +1,4 @@
-// ===============================
+﻿// ===============================
 // Datos simulados del sistema
 // ===============================
 const ADMIN_MESSAGES_KEY = "ema-hospital-admin-messages";
