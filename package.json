@@ -1,0 +1,23 @@
+{
+  "name": "e.m.a",
+  "version": "1.0.0",
+  "description": "Sistema de comunicación asistida para entornos hospitalarios, diseñado para facilitar la interacción entre el personal de salud y pacientes con capacidades comunicativas limitadas (baja o nula visión, hipoacusia, mudez o dificultad en el habla).",
+  "main": "script.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joacomst24/E.M.A.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Joacomst24/E.M.A/issues"
+  },
+  "homepage": "https://github.com/Joacomst24/E.M.A#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^25.6.0"
+  }
+}
