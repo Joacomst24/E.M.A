@@ -188,7 +188,6 @@ let waitingSelectionListening = false;
 let pendingWaitingModeConfirmation = null;
 let blindMicPermissionChecked = false;
 let preferredFemaleVoice = null;
-let pendingConfirmation = null;
 
 function scoreVoiceAsFemale(voice) {
   const voiceText = normalizeText(`${voice.name} ${voice.lang}`);
@@ -808,6 +807,11 @@ function initializeGuestWaitingMode() {
       startWaitingVoiceSelection();
     }
   });
+  window.speechSynthesis.speak(utterance);
+}
+
+function speakWaitingInstruction() {
+  speakText("Hola, soy E.M.A, Enlace Medico Asistido. Estoy listo para adaptar esta pantalla a la forma de comunicacion que necesite. Debe esperar a que recepcion o enfermeria seleccione el modo adecuado para usted.");
 }
 
 function handleWaitingScreenTap(event) {
@@ -1239,6 +1243,7 @@ function handleBlindTranscript(transcript) {
   }
 
   const fallbackMessage = "No entendi la consulta. Puede decir: me quiero registrar, donde me atienden, necesito ayuda, o describir su sintoma para orientarlo a la especialidad correcta.";
+  const fallbackMessage = "No entendi la consulta. Puede decir registro, informacion de atencion o ayuda.";
   if (getSavedMessagesByType("blind").length > 0) {
     const extended = fallbackMessage + " Tambien puede nombrar alguno de los mensajes del personal medico que aparecen en pantalla.";
     setBlindVoiceStatus(extended);
@@ -1370,6 +1375,7 @@ function speakManagedSpeechMessage(messageId) {
 
 function speakWelcomeBlind() {
   speakText("Ha ingresado al modo audio. Puede hablarme de forma natural. Por ejemplo, diga me quiero registrar, donde me atienden, o necesito ayuda ahora.");
+  speakText("Ha ingresado al modo audio. Puede tocar la pantalla en cualquier parte para hablar con E.M.A. Diga: registro, informacion de atencion, o necesito ayuda.");
 }
 
 // ===============================

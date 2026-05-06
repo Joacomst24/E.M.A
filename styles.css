@@ -96,6 +96,8 @@ body {
   background: radial-gradient(circle at 15% 0%, #ffffff 0%, #f7f8fa 42%, #eceef1 100%);
   border-radius: 34px;
   border: 1px solid #d4d8de;
+  background: linear-gradient(180deg, #ffffff 0%, #edf1f3 100%);
+  border-radius: 28px;
   overflow: hidden;
   box-shadow: 0 20px 42px rgba(35, 45, 58, 0.18);
 }
@@ -119,6 +121,26 @@ body {
 
 .waiting-topbar {
   width: min(920px, 100%);
+.brand-lockup {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12px;
+  animation: brandFloat 4.2s ease-in-out infinite;
+}
+
+.brand-wordmark {
+  font-family: "Oswald", "Arial Narrow", sans-serif;
+  font-size: clamp(5.4rem, 18vw, 11rem);
+  line-height: 0.84;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--brand-blue);
+  text-shadow: 0 10px 28px rgba(198, 40, 40, 0.24);
+  animation: wordmarkPulse 2.6s ease-in-out infinite;
+}
+
+.brand-symbols {
   position: relative;
   display: flex;
   align-items: center;
@@ -231,6 +253,10 @@ body {
   letter-spacing: 0.03em;
   font-weight: 800;
   color: #8a939f;
+.brand-gear {
+  font-size: clamp(5.8rem, 9vw, 8.8rem);
+  color: var(--brand-blue);
+  animation: gearSpin 11s linear infinite;
 }
 
 .waiting-intro-card {
@@ -263,6 +289,31 @@ body {
 
 .waiting-intro-copy {
   text-align: left;
+.brand-robot {
+  font-size: clamp(3.2rem, 5vw, 5rem);
+  color: #f3f5f7;
+  filter: drop-shadow(8px 0 0 rgba(143, 152, 163, 0.34));
+  animation: botBob 3.4s ease-in-out infinite;
+}
+
+.waiting-tagline {
+  width: min(720px, 100%);
+  margin-top: 10px;
+  font-size: clamp(1.08rem, 2.3vw, 2rem);
+  line-height: 1.25;
+  font-weight: 700;
+  color: #5a5d63;
+}
+
+.waiting-intro {
+  width: min(700px, 100%);
+  margin-top: 14px;
+  padding: 18px 22px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(198, 40, 40, 0.14);
+  border-radius: 22px;
+  box-shadow: 0 14px 40px rgba(113, 130, 156, 0.12);
+  animation: introFade 900ms ease, cardBreath 3.6s ease-in-out infinite;
 }
 
 .waiting-greeting {
@@ -299,6 +350,7 @@ body {
   height: 14px;
   border-radius: 50%;
   background: #c5cad1;
+  background: rgba(198, 40, 40, 0.85);
   box-shadow: 0 0 0 0 rgba(198, 40, 40, 0.24);
   animation: waitingPulse 1.6s ease-in-out infinite;
 }
@@ -1104,6 +1156,18 @@ h2 {
     width: 48px;
     height: 48px;
     border-radius: 12px;
+  .waiting-intro {
+    padding: 16px 16px 18px;
+  }
+
+  .blind-stage {
+    padding: 32px 16px 24px;
+    border-radius: 18px;
+  }
+
+  .blind-status {
+    font-size: 1rem;
+    padding: 16px;
   }
 
   .waiting-brand-icon i {
